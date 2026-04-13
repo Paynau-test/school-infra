@@ -2,13 +2,11 @@ import * as cdk from "aws-cdk-lib";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as ecs from "aws-cdk-lib/aws-ecs";
 import * as ecsPatterns from "aws-cdk-lib/aws-ecs-patterns";
-import * as rds from "aws-cdk-lib/aws-rds";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import { Construct } from "constructs";
 
 interface ServicesStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
-  servicesSecurityGroup: ec2.SecurityGroup;
   dbEndpoint: string;
   dbSecretArn: string;
 }
@@ -27,13 +25,13 @@ export class ServicesStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ServicesStackProps) {
     super(scope, id, props);
 
-    // ECS Cluster (shared by all services)
+    // ECS Cluster
     const cluster = new ecs.Cluster(this, "SchoolCluster", {
       clusterName: "school-cluster",
       vpc: props.vpc,
     });
 
-    // Get DB credentials from Secrets Manager
+    // DB credentials from Secrets Manager
     const dbSecret = secretsmanager.Secret.fromSecretCompleteArn(
       this,
       "DbSecret",
@@ -41,7 +39,6 @@ export class ServicesStack extends cdk.Stack {
     );
 
     // ── phpMyAdmin on Fargate ──────────────────
-    // Public-facing so you can access it from your browser
     const phpMyAdmin = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
       "PhpMyAdmin",
@@ -55,7 +52,6 @@ export class ServicesStack extends cdk.Stack {
         taskSubnets: {
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         },
-        securityGroups: [props.servicesSecurityGroup],
         taskImageOptions: {
           image: ecs.ContainerImage.fromRegistry("phpmyadmin:5"),
           containerPort: 80,
@@ -71,7 +67,7 @@ export class ServicesStack extends cdk.Stack {
       }
     );
 
-    // Health check for phpMyAdmin
+    // Health check
     phpMyAdmin.targetGroup.configureHealthCheck({
       path: "/",
       healthyHttpCodes: "200,302",
@@ -80,7 +76,7 @@ export class ServicesStack extends cdk.Stack {
     // Output the URL
     new cdk.CfnOutput(this, "PhpMyAdminUrl", {
       value: `http://${phpMyAdmin.loadBalancer.loadBalancerDnsName}`,
-      description: "phpMyAdmin URL (access your RDS from the browser)",
+      description: "phpMyAdmin URL",
     });
   }
 }

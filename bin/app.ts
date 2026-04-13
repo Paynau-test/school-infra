@@ -18,18 +18,14 @@ const network = new NetworkStack(app, "SchoolNetwork", { env });
 const database = new DatabaseStack(app, "SchoolDatabase", {
   env,
   vpc: network.vpc,
-  dbSecurityGroup: network.dbSecurityGroup,
 });
-database.addDependency(network);
 
 // Stack 3: Services (iterate fast, ~2-3 min)
 const services = new ServicesStack(app, "SchoolServices", {
   env,
   vpc: network.vpc,
-  servicesSecurityGroup: network.servicesSecurityGroup,
   dbEndpoint: database.dbEndpoint,
   dbSecretArn: database.dbSecretArn,
 });
-services.addDependency(database);
 
 app.synth();
