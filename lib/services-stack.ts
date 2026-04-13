@@ -58,10 +58,7 @@ export class ServicesStack extends cdk.Stack {
           environment: {
             PMA_HOST: props.dbEndpoint,
             PMA_PORT: "3306",
-          },
-          secrets: {
-            PMA_USER: ecs.Secret.fromSecretsManager(dbSecret, "username"),
-            PMA_PASSWORD: ecs.Secret.fromSecretsManager(dbSecret, "password"),
+            PMA_AUTH_TYPE: "cookie",
           },
         },
       }

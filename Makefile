@@ -46,7 +46,7 @@ deploy-database:
 
 deploy-services:
 	@echo "Deploying Services stack (~2-3 min)..."
-	@$(CDK) deploy SchoolServices --require-approval never --outputs-file outputs.json
+	@$(CDK) deploy SchoolServices --require-approval never --exclusively --outputs-file outputs.json
 	@echo ""
 	@echo "=== Deploy complete ==="
 	@cat outputs.json 2>/dev/null | grep -o '"http[^"]*"' || true
@@ -94,10 +94,14 @@ status:
 
 db-info:
 	@echo "=== DB Connection Info ==="
-	@aws cloudformation describe-stacks --stack-name SchoolDatabase --query 'Stacks[0].Outputs' --output table 2>/dev/null || echo "Database stack not deployed."
+	@aws cloudformation describe-stacks --stack-name SchoolDatabase --region us-east-1 \
+		--query 'Stacks[0].Outputs' --output table 2>/dev/null || echo "Database stack not deployed."
 	@echo ""
-	@echo "To get DB password:"
-	@echo "  aws secretsmanager get-secret-value --secret-id school-db-credentials --query SecretString --output text | jq ."
+	@echo "=== DB Credentials ==="
+	@aws secretsmanager get-secret-value --secret-id school-db-credentials --region us-east-1 \
+		--query SecretString --output text 2>/dev/null | \
+		python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Host: {d[\"host\"]}\nUser: {d[\"username\"]}\nPass: {d[\"password\"]}\nPort: {d[\"port\"]}')" \
+		|| echo "Could not retrieve credentials."
 
 outputs:
 	@cat outputs.json 2>/dev/null || echo "No outputs yet. Run 'make deploy-services' first."

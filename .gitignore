@@ -3,5 +3,6 @@ dist/
 cdk.out/
 *.js
 *.d.ts
-!jest.config.js
 .env
+outputs.json
+.DS_Store

@@ -1,20 +1,4 @@
 {
-  "SchoolNetwork": {
-    "ExportsOutputRefSchoolVpcprivateSubnet1SubnetF98B533025EBB472": "subnet-060f4531cad2c7a0d",
-    "VpcId": "vpc-0d20a17de06c4d2d3",
-    "VpcCidr": "10.0.0.0/16",
-    "ExportsOutputRefSchoolVpcpublicSubnet1Subnet0D3EB1E6C66D9165": "subnet-07ea8d34a273755c8",
-    "ExportsOutputFnGetAttSchoolVpcE347F028CidrBlock6822E3C0": "10.0.0.0/16",
-    "ExportsOutputRefSchoolVpcE347F028D4C879C8": "vpc-0d20a17de06c4d2d3",
-    "ExportsOutputRefSchoolVpcprivateSubnet2Subnet0FE7C4308BE52EA0": "subnet-067c5f111f879b1bb",
-    "ExportsOutputRefSchoolVpcpublicSubnet2SubnetF2AD417F62FDC29F": "subnet-0d327bdb2ade3392e"
-  },
-  "SchoolDatabase": {
-    "DbEndpoint": "school-db.cip6sse4a8o0.us-east-1.rds.amazonaws.com",
-    "DbSecretArn": "arn:aws:secretsmanager:us-east-1:332486110755:secret:school-db-credentials-sus6a1",
-    "ExportsOutputFnGetAttSchoolDbFA3082D4EndpointAddress137EAE6E": "school-db.cip6sse4a8o0.us-east-1.rds.amazonaws.com",
-    "ExportsOutputRefSchoolDbSecretAttachmentD897ADBBF67D8058": "arn:aws:secretsmanager:us-east-1:332486110755:secret:school-db-credentials-sus6a1"
-  },
   "SchoolServices": {
     "PhpMyAdminServiceURL88C057B8": "http://School-PhpMy-H10SOLqnCiFq-104987682.us-east-1.elb.amazonaws.com",
     "PhpMyAdminUrl": "http://School-PhpMy-H10SOLqnCiFq-104987682.us-east-1.elb.amazonaws.com",
