@@ -77,12 +77,6 @@ export class ServicesStack extends cdk.Stack {
     });
 
     // ── PHP Frontend (Scores) on Fargate ────────
-    const apiUrl = new cdk.CfnParameter(this, "ApiUrl", {
-      type: "String",
-      description: "URL of the .NET scores API",
-      default: "http://localhost:3002",
-    });
-
     const phpFrontend = new ecsPatterns.ApplicationLoadBalancedFargateService(
       this,
       "PhpFrontend",
@@ -103,9 +97,9 @@ export class ServicesStack extends cdk.Stack {
           containerPort: 80,
           environment: {
             APP_ENV: "production",
-            APP_DEBUG: "false",
+            APP_DEBUG: "true",
             SESSION_DRIVER: "file",
-            API_BASE_URL: apiUrl.valueAsString,
+            API_BASE_URL: "https://0dxkllsiyf.execute-api.us-east-1.amazonaws.com/Prod",
           },
         },
       }
