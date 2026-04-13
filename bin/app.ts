@@ -6,6 +6,11 @@ import { ServicesStack } from "../lib/services-stack";
 
 const app = new cdk.App();
 
+// ── Global tags: every resource in every stack gets these ──
+cdk.Tags.of(app).add("project", "school");
+cdk.Tags.of(app).add("environment", "dev");
+cdk.Tags.of(app).add("owner", "isaac");
+
 const env = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: process.env.CDK_DEFAULT_REGION || "us-east-1",
