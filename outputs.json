@@ -14,5 +14,10 @@
     "DbSecretArn": "arn:aws:secretsmanager:us-east-1:332486110755:secret:school-db-credentials-sus6a1",
     "ExportsOutputFnGetAttSchoolDbFA3082D4EndpointAddress137EAE6E": "school-db.cip6sse4a8o0.us-east-1.rds.amazonaws.com",
     "ExportsOutputRefSchoolDbSecretAttachmentD897ADBBF67D8058": "arn:aws:secretsmanager:us-east-1:332486110755:secret:school-db-credentials-sus6a1"
+  },
+  "SchoolServices": {
+    "PhpMyAdminServiceURL88C057B8": "http://School-PhpMy-H10SOLqnCiFq-104987682.us-east-1.elb.amazonaws.com",
+    "PhpMyAdminUrl": "http://School-PhpMy-H10SOLqnCiFq-104987682.us-east-1.elb.amazonaws.com",
+    "PhpMyAdminLoadBalancerDNSBFA3A62C": "School-PhpMy-H10SOLqnCiFq-104987682.us-east-1.elb.amazonaws.com"
   }
 }
