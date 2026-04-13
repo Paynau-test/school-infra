@@ -1,97 +1,38 @@
 # school-infra
 
-AWS CDK infrastructure for the school management system. Split into 3 stacks ordered by deploy time so you never wait for the database again.
+AWS CDK infrastructure for the school management system. 3 stacks, deploy order matters only the first time.
 
-## Requirements
-
-- Node.js 18+
-- AWS CLI configured (`aws configure`)
-- AWS CDK (`npm install -g aws-cdk` or use `npx cdk`)
-
-## Stack Architecture
+## Stacks
 
 ```
-┌─────────────────────────────────────────────────┐
-│ SchoolNetwork        (~3-5 min, deploy once)    │
-│ VPC, subnets, NAT Gateway, security groups      │
-└──────────────────────┬──────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────┐
-│ SchoolDatabase       (~10-20 min, deploy once)  │
-│ RDS MySQL 8.0 (t3.micro), Secrets Manager       │
-└──────────────────────┬──────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────┐
-│ SchoolServices       (~2-3 min, iterate fast)   │
-│ ECS Fargate cluster, phpMyAdmin, ALB            │
-│ (future: PHP frontend, Lambda APIs)             │
-└─────────────────────────────────────────────────┘
+SchoolNetwork    → VPC, subnets, NAT Gateway          (~3-5 min, once)
+SchoolDatabase   → RDS MySQL 8.0, Secrets Manager     (~10-20 min, once)
+SchoolServices   → ECS Fargate (phpMyAdmin, PHP frontend), ALB  (~2-3 min)
 ```
 
-## First Time Setup
+## First Time
 
 ```bash
 make install          # Install dependencies
-make bootstrap        # Bootstrap CDK (once per AWS account/region)
-make deploy-base      # Deploy Network + Database (~15-25 min)
-make deploy-services  # Deploy phpMyAdmin (~2-3 min)
+make bootstrap        # Bootstrap CDK (once per AWS account)
+make deploy-base      # Network + Database
+make deploy-services  # ECS services
 ```
 
 ## Daily Workflow
 
 ```bash
-# Redeploy services after changes (fast)
-make deploy-services
-
-# Tear down services to save costs (DB stays intact)
-make destroy-services
-
-# Check what's deployed
-make status
-
-# Get DB connection info + password
-make db-info
-
-# Preview changes before deploying
-make diff
+make deploy-services  # Redeploy services (fast, ~2-3 min)
+make status           # Check stack status
+make db-info          # Show DB endpoint + credentials
+make diff             # Preview changes before deploying
 ```
 
-## Destroy Everything
+## Destroy
 
 ```bash
-make destroy-all      # Removes ALL stacks, no confirmation needed
+make destroy-services   # Remove services only (DB stays)
+make destroy-all        # Remove EVERYTHING
 ```
 
-All resources have `removalPolicy: DESTROY` and `deletionProtection: false` so nothing gets stuck. One command, everything gone.
-
-## Available Commands
-
-```
-SETUP
-  make install            Install npm dependencies
-  make bootstrap          Bootstrap CDK (first time per account/region)
-
-DEPLOY
-  make deploy-base        Network + Database (only once, ~15-25 min)
-  make deploy-services    phpMyAdmin + services (fast, ~2-3 min)
-  make deploy-all         Deploy everything
-
-DESTROY
-  make destroy-services   Remove services only (DB stays intact)
-  make destroy-all        Remove EVERYTHING
-
-INFO
-  make status             Show stack status in AWS
-  make db-info            Show DB endpoint and credentials
-  make diff               Preview changes before deploying
-```
-
-## Cost Estimate (dev environment)
-
-- RDS t3.micro: ~$15/month (free tier eligible first 12 months)
-- NAT Gateway: ~$32/month (the most expensive part)
-- Fargate (phpMyAdmin): ~$9/month
-- ALB: ~$16/month
-- **Total: ~$72/month** (or ~$15/month if on free tier)
-
-Tip: Use `make destroy-services` when not working to save on Fargate + ALB costs. The DB is the only thing that needs to stay up.
+All resources have `removalPolicy: DESTROY` — one command, everything gone.
