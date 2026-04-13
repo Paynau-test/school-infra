@@ -75,5 +75,52 @@ export class ServicesStack extends cdk.Stack {
       value: `http://${phpMyAdmin.loadBalancer.loadBalancerDnsName}`,
       description: "phpMyAdmin URL",
     });
+
+    // ── PHP Frontend (Scores) on Fargate ────────
+    const apiUrl = new cdk.CfnParameter(this, "ApiUrl", {
+      type: "String",
+      description: "URL of the .NET scores API",
+      default: "http://localhost:3002",
+    });
+
+    const phpFrontend = new ecsPatterns.ApplicationLoadBalancedFargateService(
+      this,
+      "PhpFrontend",
+      {
+        cluster,
+        serviceName: "school-frontend-php",
+        desiredCount: 1,
+        cpu: 256,
+        memoryLimitMiB: 512,
+        assignPublicIp: false,
+        taskSubnets: {
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+        },
+        taskImageOptions: {
+          image: ecs.ContainerImage.fromAsset("../school-frontend-php", {
+            platform: cdk.aws_ecr_assets.Platform.LINUX_AMD64,
+          }),
+          containerPort: 80,
+          environment: {
+            APP_ENV: "production",
+            APP_DEBUG: "false",
+            SESSION_DRIVER: "file",
+            API_BASE_URL: apiUrl.valueAsString,
+          },
+        },
+      }
+    );
+
+    // Health check
+    phpFrontend.targetGroup.configureHealthCheck({
+      path: "/login",
+      healthyHttpCodes: "200",
+    });
+
+    // Output the URL
+    new cdk.CfnOutput(this, "PhpFrontendUrl", {
+      value: `http://${phpFrontend.loadBalancer.loadBalancerDnsName}`,
+      description: "PHP Frontend URL (Scores)",
+    });
   }
 }
