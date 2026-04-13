@@ -5,4 +5,5 @@ cdk.out/
 *.d.ts
 .env
 outputs.json
+cdk.context.json
 .DS_Store
